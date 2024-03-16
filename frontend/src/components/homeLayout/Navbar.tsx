@@ -31,7 +31,7 @@ export default function Navbar() {
   return (
     <nav
       className="flex justify-around w-full h-16
-    place-items-center border"
+    place-items-center border mb-4 shadow-sm"
     >
       <h2 className="text-primary font-bold text-2xl">F-Star</h2>
 
