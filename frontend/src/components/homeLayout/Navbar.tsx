@@ -1,41 +1,25 @@
-import React from "react";
 import { Input } from "../ui/input";
-import {
-  ArrowBigDown,
-  ArrowDown,
-  BellDot,
-  BellIcon,
-  ChevronDown,
-  SearchIcon,
-  SearchXIcon,
-} from "lucide-react";
+import { BellIcon, ChevronDown, SearchIcon } from "lucide-react";
 import profile from "@/assets/images/dogPrfile.jpg";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@radix-ui/react-dropdown-menu";
 import { Button } from "../ui/button";
 
 export default function Navbar() {
   return (
     <nav
-      className="flex justify-around w-full h-16
+      className="flex justify-between w-s h-16
     place-items-center border mb-4 shadow-sm"
     >
-      <h2 className="text-primary font-bold text-2xl">F-Star</h2>
+      <h2 className="text-primary font-bold text-2xl pl-10">F-Star</h2>
 
-      <div className="flex place-items-center">
+      <div className="flex place-items-center w-[50%]">
         <label htmlFor="search" className="">
           <SearchIcon className="text-gray-500 inline-block w-6  text-end" />
         </label>
@@ -43,8 +27,8 @@ export default function Navbar() {
           id="search"
           type="search"
           placeholder="search"
-          className="focus-visible:ring-0 focus-visible:ring-white outline-none border-none "
-        />
+          className=" w-96 focus-visible:ring-0 focus:border-l-0 focus:border-t-0 focus-visible:ring-white outline-none  border-b-2 border-r-0 border-t-0 border-l-0"
+        ></Input>
       </div>
 
       <div className="flex place-items-center">

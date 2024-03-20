@@ -1,12 +1,16 @@
 import React from "react";
 import Navbar from "./Navbar";
-import Sidebar from "./Sidebar";
+import Section from "./Section";
+import Content from "./Content";
 
 export default function Home() {
   return (
-    <main>
+    <main className="">
       <Navbar />
-      <Sidebar />
+      <div className="flex gap-20">
+        <Section />
+        <Content />
+      </div>
     </main>
   );
 }
