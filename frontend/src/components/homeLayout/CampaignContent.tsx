@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
-import { FileDown } from "lucide-react";
+import { ArrowRight, FileDown } from "lucide-react";
 
 import CampaignTable from "../campaignLayout/CampaignTable";
 import {
@@ -13,9 +13,9 @@ import {
   PaginationPrevious,
 } from "../ui/pagination";
 import InputCSV from "./InputCSV";
+import { Link } from "react-router-dom";
 
-
-export default function Content() {
+export default function CampaignContent() {
   return (
     <aside className="max-w-max max-h-min p-5 ring-2 ring-gray-200 shadow-md rounded-md ">
       <div className="flex justify-between">
@@ -23,9 +23,12 @@ export default function Content() {
           <h3 className=" font-semibold">Campaigns</h3>
           <p>Assigned to you</p>
         </div>
+        <Link to={"/campaign/balance"}>
+          <ArrowRight />
+        </Link>
 
         <div className="flex gap-4">
-         <InputCSV />
+          <InputCSV />
           <Button variant="outline">
             <span>
               <input

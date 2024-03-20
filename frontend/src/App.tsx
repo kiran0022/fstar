@@ -9,7 +9,10 @@ export default function App() {
     <div className="relative w-screen min-h-screen">
       <BrowserRouter>
         <Routes>
-          <Route path="/campaign" element={<Home />} />
+          <Route path="/campaign">
+            <Route index element={<Home />} />
+            <Route path="balance" element={<Home />} />
+          </Route>
           <Route path="/help-center" element={<Help />} />
           <Route path="/settings" element={<Settings />} />
           {/* v6 depreciated thea arr method in path do we are using map to acheive it*/}
