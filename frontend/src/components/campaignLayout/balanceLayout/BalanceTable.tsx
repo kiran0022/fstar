@@ -9,42 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { useCampaignStore } from "@/store/campaignStore";
 import { Copy, Send } from "lucide-react";
-
-const invoices = [
-  {
-    dbCode: 456256,
-    balance: 900452,
-    custNo: 2256365256,
-    email: "customer@email.com",
-    status: "pending",
-    actions: {},
-  },
-  {
-    dbCode: 456256,
-    balance: 10564,
-    custNo: 2256365256,
-    email: "customer@email.com",
-    status: "accepted",
-    actions: {},
-  },
-  {
-    dbCode: 456256,
-    balance: 62228,
-    custNo: 2256365256,
-    email: "customer@email.com",
-    status: "declined",
-    actions: {},
-  },
-  {
-    dbCode: 456256,
-    balance: 0,
-    custNo: 2256365256,
-    email: "customer@email.com",
-    status: "conditional",
-    actions: {},
-  },
-];
 
 enum AVG_BALANCE {
   LOW = 20000,
@@ -60,10 +26,13 @@ enum STATUS {
   ACCEPETED = "accepted",
 }
 
-export default function BalanceTable() {
+export default function BalanceTable({ pagination }) {
+  const recipientsData = useCampaignStore((state) => state.recipientsData);
+  console.log(recipientsData);
+
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
       <TableHeader>
         <TableRow className=" uppercase bg-secondary tracking-wider text-xs hover:bg-secondary">
           <TableHead className="w-[200px] pl-5 font-semibold text-black">
@@ -85,61 +54,79 @@ export default function BalanceTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {invoices.map((invoice) => (
-          <TableRow key={invoice.dbCode} className="border-b-0">
-            <TableCell className="">{invoice.dbCode}</TableCell>
-            <TableCell
-              className={cn(
-                invoice.balance >= AVG_BALANCE.PROFIT
-                  ? "bg-emerald-500/50"
-                  : invoice.balance <= AVG_BALANCE.NEUTRAL
-                  ? "bg-blue-500/50"
-                  : "bg-red-500/50"
-              )}
-            >
-              {invoice.balance === 0
-                ? "$" + invoice.balance
-                : "$" +
-                  `${parseInt(
-                    invoice.balance.toString().substring(0, 3)
-                  )} ${parseInt(invoice.balance.toString().substring(3))}`}
-            </TableCell>
-            <TableCell>
-              {"+91 " +
-                `${parseInt(
-                  invoice.custNo.toString().substring(0, 2)
-                )} ${parseInt(invoice.custNo.toString().substring(2))}`}
-            </TableCell>
-            <TableCell>{invoice.email}</TableCell>
-            <TableCell
-              className={cn(
-                "text-center capitalize",
+        {recipientsData.length > 0 ? (
+          recipientsData
+            .slice(pagination * 6 - 6, pagination * 6)
+            .map((recipient: IParsedRecipient, _idx: any) => (
+              <TableRow key={_idx} className="border-b-0">
+                <TableCell className="">{recipient.db_code}</TableCell>
+                <TableCell
+                  className={cn(
+                    recipient.balance >= AVG_BALANCE.PROFIT
+                      ? "bg-emerald-500/50"
+                      : recipient.balance <= AVG_BALANCE.NEUTRAL
+                      ? "bg-blue-500/50"
+                      : "bg-red-500/50"
+                  )}
+                >
+                  {recipient.balance === 0
+                    ? "$" + recipient.balance
+                    : "$" +
+                      `${parseInt(
+                        recipient.balance.toString().substring(0, 3)
+                      )} ${parseInt(
+                        recipient.balance.toString().substring(3)
+                      )}`}
+                </TableCell>
+                <TableCell>
+                  {"+91 " +
+                    `${parseInt(
+                      recipient.campaign_mobile.toString().substring(0, 2)
+                    )} ${parseInt(
+                      recipient.campaign_mobile.toString().substring(2)
+                    )}`}
+                </TableCell>
+                <TableCell>{recipient.campaign_email}</TableCell>
+                <TableCell
+                  className={cn(
+                    "text-center capitalize",
 
-                invoice.status === STATUS.ACCEPETED
-                  ? "bg-emerald-500/50"
-                  : invoice.status === STATUS.DECLINEd
-                  ? "bg-red-500/45"
-                  : invoice.status === STATUS.CONDITIONAL
-                  ? "bg-yellow-500/50"
-                  : "bg-gray-500/20"
-              )}
-            >
-              {invoice.status}
-            </TableCell>
-            <TableCell className="flex gap-5">
-              <Copy
-                className={
-                  invoice.actions ? "text-primary " : "text-zinc-500/40"
-                }
-              />
-              <Send
-                className={
-                  invoice.actions ? "text-primary " : "text-zinc-500/40"
-                }
-              />
+                    recipient.status === STATUS.ACCEPETED
+                      ? "bg-emerald-500/50"
+                      : recipient.status === STATUS.DECLINEd
+                      ? "bg-red-500/45"
+                      : recipient.status === STATUS.CONDITIONAL
+                      ? "bg-yellow-500/50"
+                      : "bg-gray-500/20"
+                  )}
+                >
+                  {recipient.status}
+                </TableCell>
+                <TableCell className="flex gap-5">
+                  <Copy
+                    className={
+                      recipient.final_action
+                        ? "text-primary "
+                        : "text-zinc-500/40"
+                    }
+                  />
+                  <Send
+                    className={
+                      recipient.final_action
+                        ? "text-primary "
+                        : "text-zinc-500/40"
+                    }
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+        ) : (
+          <TableRow className="border-b-0">
+            <TableCell colSpan={6} className="text-center">
+              Empty Data{" "}
             </TableCell>
           </TableRow>
-        ))}
+        )}
       </TableBody>
       <TableFooter>
         {/* <TableRow>
