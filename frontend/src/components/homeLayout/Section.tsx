@@ -12,11 +12,7 @@ export default function Section() {
 
   // optimize by @apply taiwind methods
 
-  const [searchParams] = useSearchParams();
-  console.log(searchParams);
-
   const cuurentUrlLocation = window.location.pathname;
-  console.log(cuurentUrlLocation);
 
   return (
     <div className="h-[100%] border flex flex-col gap-3 w-64">

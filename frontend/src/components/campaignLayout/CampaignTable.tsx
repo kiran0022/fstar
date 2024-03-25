@@ -10,76 +10,79 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { Copy, Send } from "lucide-react";
+import { useCampaignStore } from "@/store/campaignStore";
+import { useEffect } from "react";
+import csvjson from "csvjson";
+import { usePapaParse } from "react-papaparse";
+import Papa from "papaparse";
+import CampaignTableData from "./CampaignTableData";
+import { useHistory, useNavigate } from "react-router";
+// const invoices = [
+//   {
+//     name: "INV001",
+//     duration: "Paid",
+//     startDate: "$250.00",
+//     createdBy: "Credit Card",
+//     status: "ongoing",
+//     actions: {
+//       copy: true,
+//       send: true,
+//     },
+//   },
+//   {
+//     name: "INV001",
+//     duration: "Paid",
+//     startDate: "$250.00",
+//     createdBy: "Credit Card",
+//     status: "active",
+//     actions: {
+//       copy: true,
+//       send: false,
+//     },
+//   },
+//   {
+//     name: "INV001",
+//     duration: "Paid",
+//     startDate: "$250.00",
+//     createdBy: "Credit Card",
+//     status: "inactive",
+//     actions: {
+//       copy: false,
+//       send: true,
+//     },
+//   },
+//   {
+//     name: "INV001",
+//     duration: "Paid",
+//     startDate: "$250.00",
+//     createdBy: "Credit Card",
+//     status: "aborted",
+//     actions: {
+//       copy: false,
+//       send: true,
+//     },
+//   },
+//   {
+//     name: "INV001",
+//     duration: "Paid",
+//     startDate: "$250.00",
+//     createdBy: "Credit Card",
+//     status: "completed",
+//     actions: {
+//       copy: false,
+//       send: true,
+//     },
+//   },
+// ];
 
-const invoices = [
-  {
-    name: "INV001",
-    duration: "Paid",
-    startDate: "$250.00",
-    createdBy: "Credit Card",
-    status: "ongoing",
-    actions: {
-      copy: true,
-      send: true,
-    },
-  },
-  {
-    name: "INV001",
-    duration: "Paid",
-    startDate: "$250.00",
-    createdBy: "Credit Card",
-    status: "active",
-    actions: {
-      copy: true,
-      send: false,
-    },
-  },
-  {
-    name: "INV001",
-    duration: "Paid",
-    startDate: "$250.00",
-    createdBy: "Credit Card",
-    status: "inactive",
-    actions: {
-      copy: false,
-      send: true,
-    },
-  },
-  {
-    name: "INV001",
-    duration: "Paid",
-    startDate: "$250.00",
-    createdBy: "Credit Card",
-    status: "aborted",
-    actions: {
-      copy: false,
-      send: true,
-    },
-  },
-  {
-    name: "INV001",
-    duration: "Paid",
-    startDate: "$250.00",
-    createdBy: "Credit Card",
-    status: "completed",
-    actions: {
-      copy: false,
-      send: true,
-    },
-  },
-];
-
-enum STATUS {
-  ONGOING = "ongoing",
-  INACTVE = "inactive",
-  ABORTED = "aborted",
-  COMPLETED = "completed",
-}
-
-export default function CampaignTable() {
+export default function CampaignTable({
+  recipients,
+  pagination,
+  setPagination,
+}: any) {
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
       <TableHeader>
         <TableRow className=" uppercase bg-secondary tracking-wider text-xs hover:bg-secondary">
           <TableHead className="w-[200px] pl-5 font-semibold text-black">
@@ -98,53 +101,64 @@ export default function CampaignTable() {
             status
           </TableHead>
           <TableHead className=" w-[200px] text-end text-black font-semibold">
-            {" "}
             actions
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {invoices.map((invoice) => (
-          <TableRow key={invoice.name} className="border-b-0">
-            <TableCell className="">{invoice.name}</TableCell>
-            <TableCell>{invoice.duration}</TableCell>
-            <TableCell>{invoice.startDate}</TableCell>
-            <TableCell>{invoice.createdBy}</TableCell>
-            <TableCell
-              className={cn(
-                "text-center capitalize",
-                invoice.status === STATUS.ONGOING
-                  ? "bg-yellow-400/50"
-                  : invoice.status === STATUS.COMPLETED
-                  ? "bg-emerald-500/50"
-                  : invoice.status === STATUS.ABORTED
-                  ? "bg-red-500/45"
-                  : "bg-gray-400/20"
-              )}
-            >
-              {invoice.status}
-            </TableCell>
-            <TableCell className="flex float-end gap-5">
-              <Copy
-                className={
-                  invoice.actions.copy ? "text-primary " : "text-zinc-500/40"
-                }
-              />
-              <Send
-                className={
-                  invoice.actions.send ? "text-primary " : "text-zinc-500/40"
-                }
-              />
+        {recipients.length > 0 ? (
+          recipients
+            .slice(pagination * 6 - 6, pagination * 6)
+            .map((recipient: IParsedRecipient, _idx: any) => (
+              <CampaignTableData recipient={recipient} key={_idx} />
+            ))
+        ) : (
+          <TableRow className="border-b-0">
+            <TableCell colSpan={6} className="text-center">
+              Empty Data{" "}
             </TableCell>
           </TableRow>
-        ))}
+        )}
       </TableBody>
       <TableFooter>
         {/* <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow> */}
+            <TableCell colSpan={3}>Total</TableCell>
+            <TableCell className="text-right">$2,500.00</TableCell>
+          </TableRow> */}
       </TableFooter>
     </Table>
   );
 }
+
+/* 
+
+
+data.slice(pagination * 5 - 5, pagination * 5).map((item) => {
+
+
+
+<button
+              onClick={() =>
+                pagination === 1
+                  ? setPagination(1)
+                  : setPagination(pagination - 1)
+              }
+              disabled={pagination === 1}
+              className={`${
+                pagination === 1 ? "opacity-20 cursor-not-allowed" : ""
+              }`}
+            >
+              <FaArrowLeft />
+            </button>
+            {[...Array(Math.ceil(data.length / 5))].map((page, index) => {
+              return (
+                <button onClick={() => setPagination(index + 1)}>
+                  {index + 1}
+                </button>
+              );
+            })}
+
+
+
+
+*/

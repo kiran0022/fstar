@@ -3,6 +3,8 @@ import Home from "./components/homeLayout/Home";
 
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Settings from "./components/settingsLayout/Settings";
+import CampaignPdf from "./components/campaignLayout/CampaignPdf";
+import RecipientPage from "./components/campaignLayout/RecipientPage";
 
 export default function App() {
   return (
@@ -11,8 +13,11 @@ export default function App() {
         <Routes>
           <Route path="/campaign">
             <Route index element={<Home />} />
-            <Route path="balance" element={<Home />} />
+
+            <Route path="recipientPage" element={<RecipientPage />} />
+            {/* <Route path="viewPdf/:src" element={<CampaignPdf />} /> */}
           </Route>
+          <Route path="/balance" element={<Home />} />
           <Route path="/help-center" element={<Help />} />
           <Route path="/settings" element={<Settings />} />
           {/* v6 depreciated thea arr method in path do we are using map to acheive it*/}

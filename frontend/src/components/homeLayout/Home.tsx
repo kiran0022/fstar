@@ -1,9 +1,9 @@
 import React from "react";
 import Navbar from "./Navbar";
 import Section from "./Section";
-import CampaignContent from "./CampaignContent";
+import CampaignContent from "../campaignLayout/CampaignContent";
 
-import BalanceContent from "./BalanceContent";
+import BalanceContent from "../campaignLayout/balanceLayout/BalanceContent";
 
 export default function Home() {
   const currentLocation = window.location.pathname;
@@ -15,9 +15,9 @@ export default function Home() {
         <Section />
         {currentLocation == "/campaign" ? (
           <CampaignContent />
-        ) : (
+        ) : currentLocation == "/balance" ? (
           <BalanceContent />
-        )}
+        ) : null}
       </div>
     </main>
   );
