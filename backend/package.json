@@ -1,0 +1,30 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.1"
+  },
+  "dependencies": {
+    "@react-pdf/render": "^3.4.3",
+    "@react-pdf/renderer": "^3.4.0",
+    "body-parser": "^1.20.2",
+    "csv-parser": "^3.0.0",
+    "csvjson": "^5.1.0",
+    "express-fileupload": "^1.5.0",
+    "fs": "^0.0.1-security",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.0",
+    "papaparse": "^5.4.1",
+    "uuid": "^9.0.1"
+  }
+}
