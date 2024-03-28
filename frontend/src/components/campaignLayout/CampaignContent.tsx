@@ -37,7 +37,9 @@ export default function CampaignContent() {
   const sendEmails = async () => {
     console.log("froenend emali rige");
     try {
-      const response = await axios.get("http://localhost:8080/sendMail");
+      // const response = await axios.get("http://localhost:8080/sendMail");
+      // below is resend method
+      const response = await axios.get("http://localhost:8080/sendEmailResend");
       console.log(response.data);
       console.log("response json");
     } catch (error) {

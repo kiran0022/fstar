@@ -35,7 +35,9 @@ export default function CampaignTableData({ recipient }) {
       </TableCell>
       <TableCell className="flex float-end gap-5">
         <Link
-          to={`/campaign/recipientPage?email=${recipient.campaign_email}`}
+          to={`http://localhost:8080/public/pdfs/${recipient.campaign_email}.pdf`}
+          target="_blank"
+          rel="noopener noreferrer"
           // onClick={() => <RecipientPage email={recipient.campaign_email} />}
         >
           <Copy
