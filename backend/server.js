@@ -14,6 +14,8 @@ const { parse } = require("path");
 const nodemailer = require("nodemailer");
 const path = require("path");
 const { trace } = require("console");
+const { Resend } = require("resend");
+const PDFDocument = require("pdfkit");
 
 var corsOptions = {
   origin: ["http://localhost:5173", "http://localhost:8080"],
@@ -21,9 +23,33 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use(function (req, res, next) {
+  var allowedDomains = ["http://localhost:5173", "http://localhost:8080"];
+  var origin = req.headers.origin;
+  if (allowedDomains.indexOf(origin) > -1) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type, Accept"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", true);
+
+  next();
+});
+
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use("/pdf", express.static(path.join(__dirname, "pdfs")));
+
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.json({ message: "welcome to bell" });
@@ -37,28 +63,6 @@ db.sequelize
   .catch((err) => {
     console.log("error while sync db" + err.message);
   });
-
-//devv ai
-
-// const upload = multer({ dest: "uploads/" });
-
-// app.post("/upload", upload.single("csvFile"), (req, res) => {
-//   const filePath = req.file.path;
-//   console.log(filePath);
-//   const readStream = fs.createReadStream(filePath);
-//   let parsedData = [];
-
-//   Papa.parse(readStream, {
-//     header: true,
-//     step: function (result) {
-//       parsedData.push(result.data);
-//     },
-//     complete: function () {
-//       console.log(parsedData);
-//       res.json(parsedData);
-//     },
-//   });
-// });
 
 // own merge
 
@@ -85,77 +89,141 @@ app.post("/importRecipients", upload.single("csvFile"), (req, res) => {
       console.log("recipientsssss", recipients);
       //  const pdfFiles = [];
       recipients.forEach((recipient, _idx) => {
-        const pdfContent = `Name: ${recipient.campaign_name}\nEmail: ${recipient.campaign_email}\nBalance: ${recipient["Department"]}`;
+        const doc = new PDFDocument();
+
+        doc.pipe(
+          fs.createWriteStream(
+            `${path.join(
+              __dirname,
+              "public",
+              "pdfs",
+              `${recipient.campaign_email}.pdf`
+            )}`
+          )
+        );
+
+        doc.fontSize(24).text(recipient.campaign_email);
+        doc.fontSize(24).text(recipient.campaign_name);
+        doc.fontSize(24).text(recipient.balance);
+        doc.fontSize(24).text(recipient.duration);
+
+        doc.end();
+
         const pdfFileName = `${recipient.campaign_email}.pdf`;
         // console.log(pdfFileName);
-        const pdfFilePath = `pdfs/${pdfFileName}`;
-        fs.writeFileSync(pdfFilePath, pdfContent);
+        // const pdfFilePath = `pdfs/${pdfFileName}`;
+        const pdfFilePath = `${path.join(
+          __dirname,
+          "public",
+          "pdfs",
+          `${recipient.campaign_email}.pdf`
+        )}`;
+        // fs.writeFileSync(pdfFilePath, pdfContent);
         // pdfFiles.push(pdfFilePath);
         pdfFilePaths[recipient.campaign_email] = pdfFilePath;
+
+        console.log(pdfFilePath, "---> pdf file path");
       });
     },
 
     complete: function () {
-      console.log("parsedData", parsedData);
-      console.log("-----------pdfFilepa-------------");
       console.log(pdfFilePaths);
       res.status(200).json(parsedData);
     },
   });
 });
 
-// alterative method
-app.get("/sendMail", async (req, res) => {
-  const { pdfFiles } = req.body;
+// alterative method (old)
 
-  console.log("email send process begins >>>>>>>>>>>>>>.");
+// app.get("/sendMail", async (req, res) => {
+//   const { pdfFiles } = req.body;
 
-  const testAccount = await nodemailer.createTestAccount();
+//   console.log("email send process begins >>>>>>>>>>>>>>.");
 
-  let transporter = nodemailer.createTransport({
-    // host: "",
-    port: 465, //uses port 465 if secure is true.
-    secure: true,
-    service: "gmail",
-    auth: {
-      user: "testmailfstar@gmail.com",
-      pass: "wbrk wklc fldq jrmk",
-    },
-  });
+//   const testAccount = await nodemailer.createTestAccount();
 
-  Object.values(pdfFilePaths).forEach(async (pdfFilePath) => {
-    console.log(pdfFilePath);
-    let mailoptions = await transporter.sendMail({
-      from: "testmailfstar@gmail.com", // sender address
-      to: "ramsanjaydev08@gmail.com", // list of recipients
-      subject: "mass ah geut ah", // Subject line
-      text: "My first Nodemailer email!", // plain text body
-      html: "<b>My first Nodemailer email!</b>", // html body
+//   let transporter = nodemailer.createTransport({
+//     // host: "",
+//     port: 465, //uses port 465 if secure is true.
+//     secure: true,
+//     service: "gmail",
+//     auth: {
+//       user: "testmailfstar@gmail.com",
+//       pass: "wbrk wklc fldq jrmk",
+//     },
+//   });
+
+//   Object.values(pdfFilePaths).forEach(async (pdfFilePath) => {
+//     console.log(pdfFilePath);
+//     let mailoptions = await transporter.sendMail({
+//       from: "testmailfstar@gmail.com", // sender address
+//       to: "ramsanjaydev08@gmail.com", // list of recipients
+//       subject: "mass ah geut ah", // Subject line
+//       text: "My first Nodemailer email!", // plain text body
+//       html: "<b>My first Nodemailer email!</b>", // html body
+//       attachments: [
+//         {
+//           filename: path.basename(pdfFilePath),
+//           path: pdfFilePath,
+//         },
+//       ],
+//     });
+
+//     transporter.sendMail(mailoptions, (error, info) => {
+//       if (error) {
+//         console.log("errir sending mail", error);
+//       } else {
+//         console.log("emil send", info.response);
+//       }
+//     });
+//     console.log(mailoptions + "waas sent");
+//   });
+//   res.json({ message: "email done" });
+// });
+
+// using resend (new)
+const resend = new Resend("re_DT58EC84_KB3QYQxhu3eBuZMP31NBhYx4");
+app.get("/sendEmailResend", async (req, res) => {
+  Object.keys(pdfFilePaths).forEach(async (pdfFileName) => {
+    console.log(pdfFileName, "filename");
+    const { data, error } = await resend.emails.send({
+      from: "Acme <onboarding@resend.dev>",
+      to: ["testmailfstar@gmail.com", "ramsanjaydev08@gmail.com"],
+      subject: "hello world",
+      html: "<p>Congrats on sending your <strong>first email</strong>!</p>",
       attachments: [
         {
-          filename: path.basename(pdfFilePath),
-          path: pdfFilePath,
+          path: `${path.join(
+            __dirname,
+            "public",
+            "pdfs",
+            `${pdfFileName}.pdf`
+          )}`,
+          filename: `${pdfFileName}.pdf`,
+
+          // filename: path.basename(pdfFilePath),
+          // path: pdfFilePath,
+          // http://localhost:8080/public/pdfs/zaiton@example.com.pdf
         },
       ],
+      text: "regardS to dev",
     });
-
-    transporter.sendMail(mailoptions, (error, info) => {
-      if (error) {
-        console.log("errir sending mail", error);
-      } else {
-        console.log("emil send", info.response);
-      }
-    });
-    console.log(mailoptions + "waas sent");
+    console.log("----------------------");
+    console.log(data, error);
   });
-  res.json({ message: "email done" });
+  // if (error ) {
+  //   return res.status(400).json({ error });
+  // }
+  res.status(200).json("email sent sucess resend");
 });
+// re_aWVbMUS9_2t9FvqEGLz7DPbHPraJ4pwT5
+// re_DT58EC84_KB3QYQxhu3eBuZMP31NBhYx4
 
 app.get("/pdf", (req, res) => {
-  console.log("srver email, works");
+  console.log("serve pdf, works");
   const email = req.query.email;
   console.log(req.query);
-  const pdfPath = path.join(__dirname, "pdfs", `${email}.pdf`);
+  const pdfPath = path.join(__dirname, "public", "pdfs", `${email}.pdf`);
   console.log(pdfPath);
   if (fs.existsSync(pdfPath)) {
     res.send(pdfPath);
